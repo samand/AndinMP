@@ -12,6 +12,7 @@ public class Andin extends Application{
 	
 	public MediaPlayer mediaplayer; //Huvudspelaren, uppdateras vartefter.
 	public ArrayList<Media> queue;	//Lista med media som skall spelas upp.
+	public Media currentMedia; 		//Nuvarande media
 	public static void main(String[] args) {
 		launch(args); // Ladda applikationen
 
@@ -21,13 +22,15 @@ public class Andin extends Application{
 	public void start(Stage primaryStage){
 		
 		// INITIAL TESTNING
-		StackPane layout = new StackPane();
+		Group group = new Group();
 		
 		Button playButton = new Button("SHIEEET");
 		playButton.setOnAction(e -> System.out.println("IT WORKS XDD TOP LEL OMG LE TROLEFACE"));
 		
-		layout.getChildren().add(playButton);
-		Scene scene = new Scene(layout, 400,400, Color.BLACK);
+		group.getChildren().add(playButton);
+		
+		Scene scene = new Scene(group, 400,400, Color.CORNFLOWERBLUE);
+		
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
