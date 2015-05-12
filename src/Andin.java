@@ -7,7 +7,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.media.*;
 import java.util.*;
-import javax.xml.xpath.*;
+
 
 
 public class Andin extends Application{
@@ -35,9 +35,10 @@ public class Andin extends Application{
 		
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		Playlist.renamePlaylist("fjskl");
 	}
 	public void addPlaylist(){
-		//TODO 
+		//TODO
 	}
 	public void removePlaylist(String name){
 		//TODO
