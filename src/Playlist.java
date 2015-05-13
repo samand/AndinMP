@@ -48,24 +48,31 @@ public class Playlist {
 		}
 	}
 
-	public static String[] getPlaylist(String name){
+	private static String[] xpathSearch(String expr){
 		try{
-		
-		Document document = docParser();
-		XPath xPath =  XPathFactory.newInstance().newXPath();
-		String expr = "/playlists/playlist[name='"+name+"']/media";
-		System.out.println(expr);
-		NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
-		String[] songPaths = new String[nodeList.getLength()];
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			songPaths[i] = nodeList.item(i).getFirstChild().getNodeValue();	
-		}
-		return songPaths;
+			Document document = docParser();
+			XPath xPath =  XPathFactory.newInstance().newXPath();
+			System.out.println(expr);
+			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
+			String[] result = new String[nodeList.getLength()];
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				result[i] = nodeList.item(i).getFirstChild().getNodeValue();	
+			}
+			return result;
 		}
 		catch (Exception e){
 			return null;
 		}
-		
+	}
+	public static String[] getMediaPaths(String name){
+		String expr = "/playlists/playlist[name='"+name+"']/media";
+		String[] songPaths = xpathSearch(expr);
+		return songPaths;
+	}
+	public static String[] getPlaylists(){
+		String expr = "/playlists/playlist/name";
+		String[] playlists = xpathSearch(expr);
+		return playlists;
 	}
 	public static void newPlaylist(String plName){
 		//Make sure no duplicates are created!!

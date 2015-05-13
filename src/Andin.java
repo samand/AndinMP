@@ -35,7 +35,10 @@ public class Andin extends Application{
 		
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+		String[] slask = Playlist.getPlaylists();
+		for (String s:slask){
+			System.out.println(s);
+		}
 	}
 	public void addPlaylist(){
 		//TODO
