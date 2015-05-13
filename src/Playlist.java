@@ -10,7 +10,7 @@ import javax.xml.transform.stream.*;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
+//import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -21,14 +21,15 @@ import org.w3c.dom.Element;
 public class Playlist {
 	
 	
-	private static String xmlfile;
+	
+	private String xmlfile;
 	
 	public void setXMLSource(String path){
-		xmlfile = path;
+		this.xmlfile = path;
 	}
-	private static Document docParser(){
+	private Document docParser(){
 		try{
-			File file = new File(xmlfile);
+			File file = new File(this.xmlfile);
 			DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuild = docFact.newDocumentBuilder();
 			Document document = docBuild.parse(file);
@@ -38,10 +39,10 @@ public class Playlist {
 			return null;
 		}
 	}
-	private static void transforming(Document document){
+	private void transforming(Document document){
 		try{
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			StreamResult result = new StreamResult(new FileOutputStream("/Users/Samuel/Documents/EclipseWS/AndinMP/src/playlists.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream(this.xmlfile));
 			DOMSource source = new DOMSource(document);
 			transformer.transform(source, result);
 		}
@@ -49,7 +50,7 @@ public class Playlist {
 		}
 	}
 
-	private static String[] xpathSearch(String expr){
+	private String[] xpathSearch(String expr){
 		try{
 			Document document = docParser();
 			XPath xPath =  XPathFactory.newInstance().newXPath();
@@ -65,19 +66,27 @@ public class Playlist {
 			return null;
 		}
 	}
-	public static String[] getMediaPaths(String name){
+	public String[] getMediaPaths(String name){
 		String expr = "/playlists/playlist[name='"+name+"']/media";
 		String[] songPaths = xpathSearch(expr);
 		return songPaths;
 	}
-	public static String[] getPlaylists(){
+	public String[] getPlaylists(){
 		String expr = "/playlists/playlist/name";
 		String[] playlists = xpathSearch(expr);
 		return playlists;
 	}
-	public static void newPlaylist(String plName){
+	public void newPlaylist(String plName){
 		//Make sure no duplicates are created!!
 		Document document = docParser();
+		String expr = "/playlists/playlist[name='"+plName+"']";
+		String[] prevPL = xpathSearch(expr); //Should be empty.
+		if (prevPL.length==0){
+			System.out.println("celebrate on github with the slaskarna");
+		}
+		else{
+			System.out.println("prevPL.length = "+prevPL.length);
+		}
 		Element newElement = document.createElement("playlist");
 		newElement.setTextContent(plName);
 		Element root = document.getDocumentElement();
@@ -86,7 +95,7 @@ public class Playlist {
 		transforming(document);
 		//TODO
 	}
-	public static void addMedia(String playlist, String newSong){
+	public void addMedia(String playlist, String newSong){
 		Document document = docParser();
 		
 		NodeList plElement = document.getElementsByTagName("playlist");   //IF plElement exists, else do something else. Try stuff.
@@ -104,13 +113,13 @@ public class Playlist {
 		transforming(document);
 
 	}
-	public static void removeMedia(String name){
+	public void removeMedia(String name){
 		//TODO
 	}
-	public static void renamePlaylist(String name){				
+	public void renamePlaylist(String name){				
 		//TODO
 	}
-	public static void deletePlaylist(String name){
+	public void deletePlaylist(String name){
 		//TODO
 	}
 	
