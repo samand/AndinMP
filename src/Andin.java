@@ -32,7 +32,11 @@ public class Andin extends Application{
 		BorderPane borderPane = new BorderPane();
 		
 		//test
-		ObservableList<String> playlists =FXCollections.observableArrayList("My playlist");
+		ObservableList<String> playlists =FXCollections.observableArrayList();
+		String[] playlistStrings=Playlist.getPlaylists();
+		for(String s: playlistStrings){
+			playlists.add(s);
+		}
 		playlistView.setItems(playlists);
 		
 		// Meny
