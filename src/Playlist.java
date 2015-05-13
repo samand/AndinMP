@@ -7,6 +7,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -15,6 +19,12 @@ import org.w3c.dom.Element;
 
 
 public class Playlist {
+	
+	private String file;
+	
+	public void setXMLSource(String path){
+		//TODO
+	}
 	private static Document docParser(){
 		try{
 			File file = new File("/Users/Samuel/Documents/EclipseWS/AndinMP/src/playlists.xml");
@@ -37,45 +47,64 @@ public class Playlist {
 		catch (Exception e){
 		}
 	}
+
+	public static String[] getPlaylist(String name){
+		try{
+		
+		Document document = docParser();
+		XPath xPath =  XPathFactory.newInstance().newXPath();
+		String expr = "/playlists/playlist[name='"+name+"']/media";
+		System.out.println(expr);
+		NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
+		String[] songPaths = new String[nodeList.getLength()];
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			songPaths[i] = nodeList.item(i).getFirstChild().getNodeValue();	
+		}
+		return songPaths;
+		}
+		catch (Exception e){
+			return null;
+		}
+		
+	}
 	public static void newPlaylist(String plName){
 		//Make sure no duplicates are created!!
 		Document document = docParser();
-		
+
 		Element newElement = document.createElement("playlist");
 		newElement.setTextContent(plName);
 		Element root = document.getDocumentElement();
 		root.appendChild(newElement);
-		
+
 		transforming(document);
 		//TODO
 	}
 	public static void addMedia(String playlist, String newSong){
 		Document document = docParser();
+		
+		NodeList plElement = document.getElementsByTagName("playlist");   //IF plElement exists, else do something else. Try stuff.
+		
+		for (int i=0; i <plElement.getLength();i++){
+			Node node = plElement.item(i); //Fadäs??
+			System.out.println(node.getChildNodes().toString());
+			System.out.println(node.getNodeName());
+			Node chNodes = node.getLastChild();
 
-		Element plElement = (Element) document.getElementsByTagName("playlist").item(0);   //IF plElement exists, else do something else. Try stuff.
-		Node chNodes = plElement.getLastChild();
-		Element newElement = document.createElement("media");// Element to be inserted
-		newElement.setTextContent(newSong);
-		chNodes.getParentNode().insertBefore(newElement, chNodes.getNextSibling());
-
+			Element newElement = document.createElement("media");// Element to be inserted
+			newElement.setTextContent(newSong);
+			chNodes.getParentNode().insertBefore(newElement, chNodes.getNextSibling());
+		}
 		transforming(document);
-			
+
 	}
 	public static void removeMedia(String name){
 		//TODO
 	}
-	public static void renamePlaylist(String name){
-		Document document = docParser();
-		
-		
-		Element plElement = (Element) document.getElementById("My Playlist");
-		System.out.println("gfjdklöafjdkölsafjköldjfklöajdfklöasjfklöseda");
-		System.out.println(plElement.getTextContent());
-		
+	public static void renamePlaylist(String name){				
 		//TODO
 	}
 	public static void deletePlaylist(String name){
-		
+		//TODO
 	}
 	
 }

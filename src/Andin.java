@@ -35,7 +35,7 @@ public class Andin extends Application{
 		
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		Playlist.renamePlaylist("fjskl");
+		
 	}
 	public void addPlaylist(){
 		//TODO
