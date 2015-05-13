@@ -20,14 +20,15 @@ import org.w3c.dom.Element;
 
 public class Playlist {
 	
-	private String file;
+	
+	private static String xmlfile;
 	
 	public void setXMLSource(String path){
-		//TODO
+		xmlfile = path;
 	}
 	private static Document docParser(){
 		try{
-			File file = new File("/Users/Samuel/Documents/EclipseWS/AndinMP/src/playlists.xml");
+			File file = new File(xmlfile);
 			DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuild = docFact.newDocumentBuilder();
 			Document document = docBuild.parse(file);
@@ -77,7 +78,6 @@ public class Playlist {
 	public static void newPlaylist(String plName){
 		//Make sure no duplicates are created!!
 		Document document = docParser();
-
 		Element newElement = document.createElement("playlist");
 		newElement.setTextContent(plName);
 		Element root = document.getDocumentElement();
