@@ -20,18 +20,32 @@ import org.w3c.dom.Element;
 
 public class Playlist {
 	
-	
-	
+	private DocumentBuilderFactory docFact;
+	private TransformerFactory transFact;
+	private XPathFactory xPathFact;
 	private String xmlfile;
+	
+	public Playlist(){
+		this.docFact = DocumentBuilderFactory.newInstance();
+		this.transFact = TransformerFactory.newInstance();
+		this.xPathFact = XPathFactory.newInstance();
+	}
+	public Playlist(String path){
+		this.docFact = DocumentBuilderFactory.newInstance();
+		this.transFact = TransformerFactory.newInstance();
+		this.xPathFact = XPathFactory.newInstance();
+		this.xmlfile = path;
+	}
 	
 	public void setXMLSource(String path){
 		this.xmlfile = path;
 	}
+	
 	private Document docParser(){
 		try{
 			File file = new File(this.xmlfile);
-			DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuild = docFact.newDocumentBuilder();
+			//DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuild = this.docFact.newDocumentBuilder();
 			Document document = docBuild.parse(file);
 			return document;
 		}
@@ -41,7 +55,8 @@ public class Playlist {
 	}
 	private void transforming(Document document){
 		try{
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			//Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			Transformer transformer = this.transFact.newTransformer();
 			StreamResult result = new StreamResult(new FileOutputStream(this.xmlfile));
 			DOMSource source = new DOMSource(document);
 			transformer.transform(source, result);
@@ -49,12 +64,12 @@ public class Playlist {
 		catch (Exception e){
 		}
 	}
-
 	private String[] xpathSearch(String expr){
 		try{
 			Document document = docParser();
-			XPath xPath =  XPathFactory.newInstance().newXPath();
-			System.out.println(expr);
+			//XPath xPath =  XPathFactory.newInstance().newXPath();
+			XPath xPath = this.xPathFact.newXPath();
+			//System.out.println(expr);
 			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
 			String[] result = new String[nodeList.getLength()];
 			for (int i = 0; i < nodeList.getLength(); i++) {
@@ -76,6 +91,8 @@ public class Playlist {
 		String[] playlists = xpathSearch(expr);
 		return playlists;
 	}
+	
+	
 	public void newPlaylist(String plName){
 		//Make sure no duplicates are created!!
 		Document document = docParser();
@@ -93,14 +110,15 @@ public class Playlist {
 		root.appendChild(newElement);
 
 		transforming(document);
-		//TODO
 	}
+	
+	
 	public void addMedia(String playlist, String newSong){
 		Document document = docParser();
 		
 		NodeList plElement = document.getElementsByTagName("playlist");   //IF plElement exists, else do something else. Try stuff.
-		
-		for (int i=0; i <plElement.getLength();i++){
+		int plElemLength = plElement.getLength();
+		for (int i=0; i <plElemLength;i++){
 			Node node = plElement.item(i); //Fadäs??
 			System.out.println(node.getChildNodes().toString());
 			System.out.println(node.getNodeName());
@@ -114,9 +132,6 @@ public class Playlist {
 
 	}
 	public void removeMedia(String name){
-		//TODO
-	}
-	public void renamePlaylist(String name){				
 		//TODO
 	}
 	public void deletePlaylist(String name){
