@@ -21,6 +21,7 @@ public class Andin extends Application{
 	}
 	@Override
 	public void start(Stage primaryStage){
+		//ASDASDASD
 		// Actual stuff
 		fileChooser = new FileChooser();
 		queue = new LinkedList<Media>();
