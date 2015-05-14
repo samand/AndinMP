@@ -114,7 +114,7 @@ public class Playlist {
 		NodeList plElement = document.getElementsByTagName("playlist");   //IF plElement exists, else do something else. Try stuff.
 		int plElemLength = plElement.getLength();
 		for (int i=0; i <plElemLength;i++){
-			Node node = plElement.item(i); //Fadäs??
+			Node node = plElement.item(i); 
 			System.out.println(node.getChildNodes().toString());
 			System.out.println(node.getNodeName());
 			Node chNodes = node.getLastChild();
