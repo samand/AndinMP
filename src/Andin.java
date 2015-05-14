@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Andin extends Application{
 	public FileChooser fileChooser;
-	public MediaView mediaView;		//Global spelare för all media
+	public MediaView mediaView;		//Global vy för all media
 	public LinkedList<Media> queue;	//Lista med media som skall spelas upp.
 	public ListView<String> playlistView;
 	public static void main(String[] args) {
@@ -33,12 +33,13 @@ public class Andin extends Application{
 		
 		//test
 		ObservableList<String> playlists =FXCollections.observableArrayList();
+		/*
 		String[] playlistStrings=Playlist.getPlaylists();
 		for(String s: playlistStrings){
 			playlists.add(s);
 		}
 		playlistView.setItems(playlists);
-		
+		*/
 		// Meny
 		MenuBar menuBar = new MenuBar();
 		Menu menuFile = new Menu("File");
@@ -82,7 +83,7 @@ public class Andin extends Application{
 		menuFile.getItems().addAll(playMedia, queueMedia);
 		menuPlaylist.getItems().addAll(newPlaylist, playPlaylist, queuePlaylist);
 		menuBar.getMenus().addAll(menuFile, menuPlaylist);
-
+		
 		StackPane s = new StackPane();
 		
 		Pane p = new Pane();
@@ -110,12 +111,17 @@ public class Andin extends Application{
 			
 		});
 		
+		Label l = new Label("Now playing:");
 		
 		HBox buttonbox = new HBox();
 		buttonbox.getChildren().add(playButton);buttonbox.getChildren().add(pauseButton);
-		buttonbox.getChildren().add(stopButton);buttonbox.getChildren().add(nextButton);
+		buttonbox.getChildren().add(stopButton);buttonbox.getChildren().add(nextButton);buttonbox.getChildren().add(l);
+		BorderPane test = new BorderPane();
+		test.setRight(l);
+		test.setLeft(buttonbox);
+		
 		borderPane.setTop(menuBar);
-		borderPane.setBottom(buttonbox);
+		borderPane.setBottom(test);
 
 		borderPane.setLeft(playlistView);
 		Scene scene = new Scene(borderPane, 1920,1080, Color.CORNFLOWERBLUE);
@@ -151,6 +157,26 @@ public class Andin extends Application{
 			mediaArray[i] = new Media(paths[i]);
 		}
 		return mediaArray; 
+	}
+	private HBox makeButtons(){
+		HBox buttonbox = new HBox();
+		Button playButton = new Button("Play");
+		playButton.setOnAction(e -> mediaView.getMediaPlayer().play());
+		Button pauseButton = new Button("Pause");
+		pauseButton.setOnAction(e -> mediaView.getMediaPlayer().pause());
+		Button stopButton = new Button("Stop");
+		stopButton.setOnAction(l -> mediaView.getMediaPlayer().stop());
+		Button nextButton = new Button("Next");
+		nextButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+					mediaView.getMediaPlayer().stop();
+					initMediaPlayer();
+					
+			}
+			
+		});
+		return buttonbox;
 	}
 	
 	
