@@ -3,10 +3,10 @@
 		<name>My Playlist</name>
 		<media>C:/Users/william/Music/shit.mp3</media>
 		<media>C:/Users/william/Music/cold.mp3</media>
-	</playlist>
+	<media>this is my newtrack</media><media>this is my newtrack</media><media>this is my newtrack</media><media>this is my newtrack</media><media>this is my newtrack</media></playlist>
 	<playlist>
 		<name>My slaskars</name>
 		<media>thisisasong</media>
 		<media>thisabettersong</media>
 	</playlist>
-</playlists>
+<playlist><name>I need a new one!!</name><media>this is my newtrack</media><media>this is my newtrack</media><media>this is my newtrack</media><media>this is my newtrack</media></playlist></playlists>
