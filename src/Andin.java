@@ -9,8 +9,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.media.*;
 import java.util.*;
+import javafx.scene.input.*;
 
 public class Andin extends Application{
+	public String nowPlaying;
+	public Playlist playlistHandler;
 	public FileChooser fileChooser;
 	public MediaView mediaView;		//Global vy för all media
 	public LinkedList<Media> queue;	//Lista med media som skall spelas upp.
@@ -27,21 +30,32 @@ public class Andin extends Application{
 		fileChooser = new FileChooser();
 		queue = new LinkedList<Media>();
 		playlistView = new ListView<String>();
-		
-		
+
+
 		mediaView = new MediaView();
-		
+
 		BorderPane borderPane = new BorderPane();
-		
+		playlistHandler = new Playlist();
+		playlistHandler.setXMLSource("C:/Users/william/workspace/AndinMP/src/playlists.xml");
 		//test
 		ObservableList<String> playlists =FXCollections.observableArrayList();
-		/*
-		String[] playlistStrings=Playlist.getPlaylists();
+
+		String[] playlistStrings=playlistHandler.getPlaylists();
 		for(String s: playlistStrings){
 			playlists.add(s);
 		}
+
+		/*
+						String playlistname = playlistView.getSelectionModel().getSelectedItem();
+						String[] mediaPaths = playlistHandler.getMediaPaths(playlistname);
+						Media[] mediaArray = buildPlaylist(mediaPaths);
+
+						for(int i=1;i<mediaArray.length;i++){
+							queueMedia(mediaArray[i]);
+						}
+		 */
+
 		playlistView.setItems(playlists);
-		*/
 		// Meny
 		MenuBar menuBar = new MenuBar();
 		Menu menuFile = new Menu("File");
@@ -74,8 +88,7 @@ public class Andin extends Application{
 				if (file != null) {
 
 					Media m = new Media(file.toURI().toString());
-					queue.add(m);
-					if(mediaView.getMediaPlayer() == null) {initMediaPlayer();}
+					queueMedia(m);
 				}
 			}
 		});
@@ -85,43 +98,79 @@ public class Andin extends Application{
 		menuFile.getItems().addAll(playMedia, queueMedia);
 		menuPlaylist.getItems().addAll(newPlaylist, playPlaylist, queuePlaylist);
 		menuBar.getMenus().addAll(menuFile, menuPlaylist);
-		
+
 		StackPane s = new StackPane();
-		
+
 		Pane p = new Pane();
-		p.setStyle("-fx-background-color: #003020");
+		p.setStyle("-fx-background-color: #abcdef");
 		s.getChildren().add(p);
 		s.getChildren().add(mediaView);
-		
+
 		borderPane.setCenter(s);
-		
-		//Huvudknappar
-		Button playButton = new Button("Play");
-		playButton.setOnAction(e -> mediaView.getMediaPlayer().play());
-		Button pauseButton = new Button("Pause");
-		pauseButton.setOnAction(e -> mediaView.getMediaPlayer().pause());
-		Button stopButton = new Button("Stop");
-		stopButton.setOnAction(l -> mediaView.getMediaPlayer().stop());
-		Button nextButton = new Button("Next");
-		nextButton.setOnAction(new EventHandler<ActionEvent>() {
+
+		nowPlaying="No media playing.";
+		Label l = new Label();
+		l.setText(nowPlaying);
+		HBox buttonbox = makeButtons();
+
+		AnchorPane aPane = new AnchorPane();
+		ContextMenu contextMenu = new ContextMenu();
+		MenuItem playPlaylistOption = new MenuItem("Play playlist");
+		MenuItem queuePlaylistOption = new MenuItem("Queue playlist");
+		MenuItem addToPlaylistOption = new MenuItem("Add media to playlist");
+		contextMenu.getItems().addAll(playPlaylistOption, queuePlaylistOption, addToPlaylistOption);
+		playPlaylistOption.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(final ActionEvent e) {
-					mediaView.getMediaPlayer().stop();
-					initMediaPlayer();
-					
+			public void handle(ActionEvent event) {
+				String playlistname = playlistView.getSelectionModel().getSelectedItem();
+				String[] mediaPaths = playlistHandler.getMediaPaths(playlistname);
+				Media[] mediaArray = buildPlaylist(mediaPaths);
+				playMedia(mediaArray[0]);
+				for(int i=1;i<mediaArray.length;i++){
+					queueMedia(mediaArray[i]);
+				}
 			}
-			
 		});
-		
-		Label l = new Label("Now playing:");
-		
-		HBox buttonbox = new HBox();
-		buttonbox.getChildren().add(playButton);buttonbox.getChildren().add(pauseButton);
-		buttonbox.getChildren().add(stopButton);buttonbox.getChildren().add(nextButton);buttonbox.getChildren().add(l);
+		queuePlaylistOption.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String playlistname = playlistView.getSelectionModel().getSelectedItem();
+				String[] mediaPaths = playlistHandler.getMediaPaths(playlistname);
+				Media[] mediaArray = buildPlaylist(mediaPaths);
+				
+				for(int i=0;i<mediaArray.length;i++){
+					queueMedia(mediaArray[i]);
+				}
+			}
+		});
+		addToPlaylistOption.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
+				int filesAmount = files.size();
+				String[] paths = new String[filesAmount];
+				for(int i=0;i<filesAmount;i++){
+					paths[i]=files.get(i).toURI().toString();
+				}
+				//playlistHandler.addMedia(playlist, newSong);
+				
+			}
+		});
+		playlistView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent mouseEvent) {
+				if(mouseEvent.getButton().equals(MouseButton.SECONDARY)){
+					contextMenu.show(aPane, mouseEvent.getScreenX(), mouseEvent.getSceneY());
+				}
+			}
+		});
+		playlistView.setContextMenu(contextMenu);
+
+
+
 		BorderPane test = new BorderPane();
-		test.setRight(l);
 		test.setLeft(buttonbox);
-		
+		test.setRight(l);
 		borderPane.setTop(menuBar);
 		borderPane.setBottom(test);
 
@@ -137,6 +186,7 @@ public class Andin extends Application{
 	private void initMediaPlayer(){
 		if (!queue.isEmpty()){
 			Media m = queue.pop();
+			
 			MediaPlayer mediaPlayer = new MediaPlayer(m);
 			mediaPlayer.setAutoPlay(true);
 			mediaPlayer.setOnEndOfMedia(new Runnable() {
@@ -145,8 +195,7 @@ public class Andin extends Application{
 				}
 			});
 			mediaView.setMediaPlayer(mediaPlayer);
-			System.out.println(mediaView.getMediaPlayer().getMedia().getMetadata().get("artist").toString());
-			
+
 		}else{
 			mediaView.setMediaPlayer(null);
 		}
@@ -172,15 +221,31 @@ public class Andin extends Application{
 		nextButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
-					mediaView.getMediaPlayer().stop();
-					initMediaPlayer();
-					
+				mediaView.getMediaPlayer().stop();
+				initMediaPlayer();
+
 			}
-			
+
 		});
+		buttonbox.getChildren().add(playButton);buttonbox.getChildren().add(pauseButton);
+		buttonbox.getChildren().add(stopButton);buttonbox.getChildren().add(nextButton);
 		return buttonbox;
 	}
-	
-	
+	public void queueMedia(Media m){
+		queue.add(m);
+		if(mediaView.getMediaPlayer() == null) {
+			initMediaPlayer();
+		}
+	}
+	public void playMedia(Media m){
+		queue.clear();
+		queue.add(m);
+		if(mediaView.getMediaPlayer() !=null){
+			mediaView.getMediaPlayer().stop();
+			mediaView.setMediaPlayer(null);
+		}
 
+		initMediaPlayer();
+
+	}
 }
