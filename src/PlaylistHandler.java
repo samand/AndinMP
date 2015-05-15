@@ -13,9 +13,8 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-//import org.w3c.dom.Node;
+import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-
 
 public class PlaylistHandler {
 
@@ -118,7 +117,7 @@ public class PlaylistHandler {
 		try{
 			Document document = docParser();
 			String expr = "/playlists/playlist[name='"+plName+"']";
-			XPath xPath =this.xPathFact.newXPath();
+			XPath xPath = this.xPathFact.newXPath();
 			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
 			int nodeLength = nodeList.getLength();
 			int amountToAdd = newTracks.length;
@@ -141,11 +140,43 @@ public class PlaylistHandler {
 			return;
 		}
 	}
-	public void removeMedia(String name){
+	public void removeMedia(String plName, String mediaName){
+		try{
+			Document document = docParser();
+			String expr = "/playlists/playlist[name='"+plName+"']/media";
+			XPath xPath = this.xPathFact.newXPath();
+			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
+			//Continuation depends on database buildup
+		}
+		catch (Exception e){
+			return;
+		}
 		//TODO
 	}
-	public void deletePlaylist(String name){
-		//TODO
+	public void deletePlaylist(String plName){
+		try{
+			Document document = docParser();
+			String expr = "/playlists/playlist[name='"+plName+"']";
+			XPath xPath = this.xPathFact.newXPath();
+			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document,XPathConstants.NODESET);
+			if (nodeList.getLength()==1){
+				System.out.println("noden finns och det finns bara den");
+				Node elem = nodeList.item(0);
+				System.out.println("name of selected element    "+elem.getNodeName());
+				elem.getParentNode().removeChild(elem);
+				transforming(document);
+			}
+		}
+		catch (Exception e){
+			return;
+		}
 	}
 
 }
+
+
+
+
+
+
+
