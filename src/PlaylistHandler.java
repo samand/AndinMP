@@ -10,43 +10,43 @@ import javax.xml.transform.stream.*;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathConstants;
-//import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
+//import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 
-public class Playlist {
-	
+public class PlaylistHandler {
+
 	private DocumentBuilderFactory docFact;
 	private TransformerFactory transFact;
 	private XPathFactory xPathFact;
 	private String xmlfile;
-	
-	public Playlist(){
+
+	public PlaylistHandler(){
 		this.docFact = DocumentBuilderFactory.newInstance();
 		this.transFact = TransformerFactory.newInstance();
 		this.xPathFact = XPathFactory.newInstance();
 	}
-	public Playlist(String path){
+	public PlaylistHandler(String path){
 		this.docFact = DocumentBuilderFactory.newInstance();
 		this.transFact = TransformerFactory.newInstance();
 		this.xPathFact = XPathFactory.newInstance();
 		this.xmlfile = path;
 	}
-	
 	public void setXMLSource(String path){
 		this.xmlfile = path;
 	}
-	
+
 	private Document docParser(){
 		try{
 			File file = new File(this.xmlfile);
-			//DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuild = this.docFact.newDocumentBuilder();
 			Document document = docBuild.parse(file);
+			//			System.out.println("ok lets see here now lafjadlksasfdjdflksdjfkl");
+			//			System.out.println(file.toURI().toString());
+			//			System.out.println("thats the end of that");
 			return document;
 		}
 		catch (Exception e){
@@ -55,7 +55,6 @@ public class Playlist {
 	}
 	private void transforming(Document document){
 		try{
-			//Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			Transformer transformer = this.transFact.newTransformer();
 			StreamResult result = new StreamResult(new FileOutputStream(this.xmlfile));
 			DOMSource source = new DOMSource(document);
@@ -67,13 +66,11 @@ public class Playlist {
 	private String[] xpathSearch(String expr){
 		try{
 			Document document = docParser();
-			//XPath xPath =  XPathFactory.newInstance().newXPath();
 			XPath xPath = this.xPathFact.newXPath();
-			//System.out.println(expr);
 			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
 			String[] result = new String[nodeList.getLength()];
 			for (int i = 0; i < nodeList.getLength(); i++) {
-				result[i] = nodeList.item(i).getFirstChild().getNodeValue();	
+				result[i] = nodeList.item(i).getFirstChild().getNodeValue();
 			}
 			return result;
 		}
@@ -91,49 +88,58 @@ public class Playlist {
 		String[] playlists = xpathSearch(expr);
 		return playlists;
 	}
-	
-	
 	public void newPlaylist(String plName){
-		//Make sure no duplicates are created!!
+		//Creates new playlist.
+		//If playlist already exists, prints to console and returns without changes.
 		Document document = docParser();
 		String expr = "/playlists/playlist[name='"+plName+"']";
 		String[] prevPL = xpathSearch(expr); //Should be empty.
 		if (prevPL.length==0){
-			System.out.println("celebrate on github with the slaskarna");
+			//System.out.println("celebrate on github with the slaskarna");
+			Element plElem = document.createElement("playlist");
+			Element nameElem = document.createElement("name");
+			nameElem.setTextContent(plName);
+			plElem.appendChild(nameElem);
+			Element root = document.getDocumentElement();
+			root.appendChild(plElem);
+			transforming(document);
 		}
 		else{
-			System.out.println("prevPL.length = "+prevPL.length);
+			//System.out.println("prevPL.length = "+prevPL.length);
+			System.out.println("Failed to create playlist, name "+plName+" already taken. ");
+			return;
 		}
-		Element newElement = document.createElement("playlist");
-		newElement.setTextContent(plName);
-		Element root = document.getDocumentElement();
-		root.appendChild(newElement);
-
-		transforming(document);
 	}
-	
-	
-	public void addMedia(String playlist, String newSong){
-		Document document = docParser();
-		
-		NodeList plElement = document.getElementsByTagName("playlist");   //IF plElement exists, else do something else. Try stuff.
-
-		
-	
-		int plElemLength = plElement.getLength();
-		for (int i=0; i <plElemLength;i++){
-			Node node = plElement.item(i); //Fad�s??
-
-			System.out.println(node.getChildNodes().toString());
-			System.out.println(node.getNodeName());
-			Node chNodes = node.getLastChild();
-
-			Element newElement = document.createElement("media");// Element to be inserted
-			newElement.setTextContent(newSong);
-			chNodes.getParentNode().insertBefore(newElement, chNodes.getNextSibling());
+//	public void addMedia(String plName, String newTrack){
+//		//TODO Perhaps
+//		System.out.println("Perhaps make it simple to add just a single track");
+//	}
+	public void addMedia(String plName, String[] newTracks){
+		try{
+			Document document = docParser();
+			String expr = "/playlists/playlist[name='"+plName+"']";
+			XPath xPath =this.xPathFact.newXPath();
+			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document, XPathConstants.NODESET);
+			int nodeLength = nodeList.getLength();
+			int amountToAdd = newTracks.length;
+			if(nodeLength==1){
+				for (int i=0;i<amountToAdd;i++){
+					Element trackPath = document.createElement("media");
+					trackPath.setTextContent(newTracks[i]);
+					nodeList.item(0).appendChild(trackPath);
+					transforming(document);
+				}
+			}
+			else if(nodeLength==0){
+				System.out.println("No playlist with name "+plName+".");
+			}
+			else{
+				System.out.println("Duplicate playlists with name "+plName+".");
+			}
 		}
-		transforming(document);
-
+		catch (Exception e){
+			return;
+		}
 	}
 	public void removeMedia(String name){
 		//TODO
@@ -141,5 +147,5 @@ public class Playlist {
 	public void deletePlaylist(String name){
 		//TODO
 	}
-	
+
 }
