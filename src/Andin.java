@@ -13,7 +13,7 @@ import javafx.scene.input.*;
 
 public class Andin extends Application{
 	public String nowPlaying;
-	public Playlist playlistHandler;
+	public PlaylistHandler playlistHandler;
 	public FileChooser fileChooser;
 	public MediaView mediaView;		//Global vy för all media
 	public LinkedList<Media> queue;	//Lista med media som skall spelas upp.
@@ -35,7 +35,7 @@ public class Andin extends Application{
 		mediaView = new MediaView();
 
 		BorderPane borderPane = new BorderPane();
-		playlistHandler = new Playlist();
+		playlistHandler = new PlaylistHandler();
 		playlistHandler.setXMLSource("C:/Users/william/workspace/AndinMP/src/playlists.xml");
 		//test
 		ObservableList<String> playlists =FXCollections.observableArrayList();
@@ -152,7 +152,7 @@ public class Andin extends Application{
 				for(int i=0;i<filesAmount;i++){
 					paths[i]=files.get(i).toURI().toString();
 				}
-				//playlistHandler.addMedia(playlist, newSong);
+				playlistHandler.addMedia(playlistView.getSelectionModel().getSelectedItem(), paths);
 				
 			}
 		});
