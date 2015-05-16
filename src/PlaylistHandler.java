@@ -43,9 +43,6 @@ public class PlaylistHandler {
 			File file = new File(this.xmlfile);
 			DocumentBuilder docBuild = this.docFact.newDocumentBuilder();
 			Document document = docBuild.parse(file);
-			//			System.out.println("ok lets see here now lafjadlksasfdjdflksdjfkl");
-			//			System.out.println(file.toURI().toString());
-			//			System.out.println("thats the end of that");
 			return document;
 		}
 		catch (Exception e){
