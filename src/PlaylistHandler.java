@@ -10,6 +10,7 @@ import javax.xml.transform.stream.*;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.transform.OutputKeys;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -49,11 +50,13 @@ public class PlaylistHandler {
 			return null;
 		}
 	}
-	private void transforming(Document document){
+	private void transforming(Document document, String indentationLevel){
 		try{
 			Transformer transformer = this.transFact.newTransformer();
 			StreamResult result = new StreamResult(new FileOutputStream(this.xmlfile));
 			DOMSource source = new DOMSource(document);
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indentationLevel);
 			transformer.transform(source, result);
 		}
 		catch (Exception e){
@@ -98,7 +101,7 @@ public class PlaylistHandler {
 			plElem.appendChild(nameElem);
 			Element root = document.getDocumentElement();
 			root.appendChild(plElem);
-			transforming(document);
+			transforming(document, "2");
 		}
 		else{
 			//System.out.println("prevPL.length = "+prevPL.length);
@@ -123,7 +126,7 @@ public class PlaylistHandler {
 					Element trackPath = document.createElement("media");
 					trackPath.setTextContent(newTracks[i]);
 					nodeList.item(0).appendChild(trackPath);
-					transforming(document);
+					transforming(document, "3");
 				}
 			}
 			else if(nodeLength==0){
@@ -161,7 +164,7 @@ public class PlaylistHandler {
 				Node elem = nodeList.item(0);
 				System.out.println("name of selected element    "+elem.getNodeName());
 				elem.getParentNode().removeChild(elem);
-				transforming(document);
+				transforming(document,"2");
 			}
 		}
 		catch (Exception e){
