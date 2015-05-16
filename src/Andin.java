@@ -39,27 +39,19 @@ public class Andin extends Application{
 		playlistHandler.setXMLSource("C:/testljud/playlists.xml");
 		//test
 		ObservableList<String> playlists =FXCollections.observableArrayList();
-
+		
 		String[] playlistStrings=playlistHandler.getPlaylists();
 		for(String s: playlistStrings){
 			playlists.add(s);
 		}
 
-		/*
-						String playlistname = playlistView.getSelectionModel().getSelectedItem();
-						String[] mediaPaths = playlistHandler.getMediaPaths(playlistname);
-						Media[] mediaArray = buildPlaylist(mediaPaths);
-
-						for(int i=1;i<mediaArray.length;i++){
-							queueMedia(mediaArray[i]);
-						}
-		 */
-
+		
+		Button newPlaylistButton = new Button("New Playlist");
+		//newPlaylistButton.setOnAction(); TOOOODOOOOOO
 		playlistView.setItems(playlists);
-		// Meny
+		
 		MenuBar menuBar = new MenuBar();
 		Menu menuFile = new Menu("File");
-		Menu menuPlaylist = new Menu("Playlists");
 
 		MenuItem playMedia = new MenuItem("Play media");
 		playMedia.setOnAction(new EventHandler<ActionEvent>() {
@@ -92,12 +84,9 @@ public class Andin extends Application{
 				}
 			}
 		});
-		MenuItem newPlaylist = new MenuItem("New playlist");
-		MenuItem playPlaylist = new MenuItem("Play playlist");
-		MenuItem queuePlaylist = new MenuItem("Queue playlist");
 		menuFile.getItems().addAll(playMedia, queueMedia);
-		menuPlaylist.getItems().addAll(newPlaylist, playPlaylist, queuePlaylist);
-		menuBar.getMenus().addAll(menuFile, menuPlaylist);
+		
+		menuBar.getMenus().add(menuFile);
 
 		StackPane s = new StackPane();
 
@@ -167,14 +156,19 @@ public class Andin extends Application{
 		playlistView.setContextMenu(contextMenu);
 
 
-
+		
 		BorderPane test = new BorderPane();
 		test.setLeft(buttonbox);
 		test.setRight(l);
 		borderPane.setTop(menuBar);
 		borderPane.setBottom(test);
 
-		borderPane.setLeft(playlistView);
+		
+		VBox tut = new VBox();
+		tut.getChildren().add(newPlaylistButton);
+		tut.getChildren().add(playlistView);
+		tut.setVgrow(playlistView, Priority.ALWAYS);
+		borderPane.setLeft(tut);
 		Scene scene = new Scene(borderPane, 1920,1080, Color.CORNFLOWERBLUE);
 		primaryStage.setScene(scene);
 		primaryStage.show();
