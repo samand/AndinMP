@@ -36,7 +36,7 @@ public class Andin extends Application{
 
 		BorderPane borderPane = new BorderPane();
 		playlistHandler = new PlaylistHandler();
-		playlistHandler.setXMLSource("C:/Users/william/workspace/AndinMP/src/playlists.xml");
+		playlistHandler.setXMLSource("C:/testljud/playlists.xml");
 		//test
 		ObservableList<String> playlists =FXCollections.observableArrayList();
 
