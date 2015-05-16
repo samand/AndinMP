@@ -24,7 +24,7 @@ public class Andin extends Application{
 	}
 	@Override
 	public void start(Stage primaryStage){
-		//ASDASDASD
+		//ASDASDASD 
 		//QWEQWEQWE
 		// Actual stuff
 		fileChooser = new FileChooser();
@@ -72,13 +72,13 @@ public class Andin extends Application{
 				}
 			}
 		});
+		
 		MenuItem queueMedia = new MenuItem("Queue media");
 		queueMedia.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
 				File file = fileChooser.showOpenDialog(primaryStage);
 				if (file != null) {
-
 					Media m = new Media(file.toURI().toString());
 					queueMedia(m);
 				}
@@ -95,13 +95,15 @@ public class Andin extends Application{
 		s.getChildren().add(p);
 		s.getChildren().add(mediaView);
 
+		
+		
 		borderPane.setCenter(s);
 
 		nowPlaying="No media playing.";
 		Label l = new Label();
 		l.setText(nowPlaying);
+		
 		HBox buttonbox = makeButtons();
-
 		AnchorPane aPane = new AnchorPane();
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playPlaylistOption = new MenuItem("Play playlist");
@@ -170,7 +172,9 @@ public class Andin extends Application{
 		tut.setVgrow(playlistView, Priority.ALWAYS);
 		borderPane.setLeft(tut);
 		Scene scene = new Scene(borderPane, 1920,1080, Color.CORNFLOWERBLUE);
+		
 		primaryStage.setScene(scene);
+		
 		primaryStage.show();
 
 
