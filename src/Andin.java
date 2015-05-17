@@ -270,7 +270,7 @@ public class Andin extends Application{
 		playlistBox.setVgrow(playlistView, Priority.ALWAYS);
 		return playlistBox;
 	}
-	private StackPane makeMediaPane(){
+		StackPane makeMediaPane(){
 		StackPane stackPane = new StackPane();
 
 		Pane backgroundPane = new Pane();
