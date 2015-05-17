@@ -84,6 +84,7 @@ public class Andin extends Application{
 			mediaView.setMediaPlayer(mediaPlayer);
 
 		}else{
+			nowPlaying.setText("No active media playing");
 			mediaView.setMediaPlayer(null);
 		}
 
