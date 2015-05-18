@@ -184,7 +184,7 @@ public class PlaylistHandler {
 	public void deletePlaylist(String plName){
 		try{
 			Document document = docParser();
-			String expr = "/playlists/playlist[name='"+plName+"']";
+			String expr = "/playlists/playlist[@name='"+plName+"']";
 			XPath xPath = this.xPathFact.newXPath();
 			NodeList nodeList = (NodeList) xPath.compile(expr).evaluate(document,XPathConstants.NODESET);
 			if (nodeList.getLength()==1){
