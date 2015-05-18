@@ -94,7 +94,6 @@ public class PlaylistHandler {
 		String expr = "/playlists/playlist[name='"+plName+"']";
 		String[] prevPL = xpathSearch(expr); //Should be empty.
 		if (prevPL.length==0){
-			//System.out.println("celebrate on github with the slaskarna");
 			Element plElem = document.createElement("playlist");
 			Element nameElem = document.createElement("name");
 			nameElem.setTextContent(plName);
@@ -104,7 +103,7 @@ public class PlaylistHandler {
 			transforming(document, "2");
 		}
 		else{
-			//System.out.println("prevPL.length = "+prevPL.length);
+			//If name of playlist already taken. 
 			System.out.println("Failed to create playlist, name "+plName+" already taken. ");
 			return;
 		}
