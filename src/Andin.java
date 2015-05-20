@@ -10,7 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.media.*;
-
+import javafx.geometry.*;
 import java.util.*;
 
 import javafx.scene.input.*;
@@ -19,12 +19,11 @@ public class Andin extends Application{
 	public Stage primaryStage; //huvudfÃ¶nster
 	public Label nowPlaying;  
 	public PlaylistHandler playlistHandler;//playlisthanterare som snackar med databasen
-	public FileChooser fileChooser;	//For att valja filer
 	public MediaView mediaView;		//Global vy fÃ¶r all media
 	public LinkedList<Media> queue;	//Lista med media som skall spelas upp.
 	public ListView<String> playlistView;//vyn for spellistor
 	public ListView<String> playlistContentsView; //Vyn för spellistors innehåll
-
+	public Slider volumeSlider;
 	
 	public static void main(String[] args) {
 		launch(args); // Ladda applikationen
@@ -34,7 +33,7 @@ public class Andin extends Application{
 	@Override
 	public void start(Stage stage){
 		primaryStage = stage;
-		fileChooser = new FileChooser();
+		
 		queue = new LinkedList<Media>();
 		playlistView = new ListView<String>();
 		mediaView = new MediaView();
@@ -52,17 +51,23 @@ public class Andin extends Application{
 
 		StackPane mediaPane = makeMediaPane();
 		VBox playlistBox = makePlaylistBox(mediaPane);
-
+		volumeSlider = makeSlider();
 		BorderPane bottomPane = new BorderPane();
 		bottomPane.setLeft(buttonbox);
 		bottomPane.setRight(nowPlaying);
-
+		bottomPane.setCenter(volumeSlider);
+		
+		
 		borderPane.setCenter(mediaPane);
 		borderPane.setTop(menuBar);
 		borderPane.setBottom(bottomPane);
 		borderPane.setLeft(playlistBox);
-		Scene scene = new Scene(borderPane, 1920,1080, Color.CORNFLOWERBLUE);
+		Scene scene = new Scene(borderPane, 1920,1080);
+		
+		
 		primaryStage.setScene(scene);
+		primaryStage.setTitle("Andin Media Player");
+		
 		primaryStage.show();
 	}
 	private void initMediaPlayer(){
@@ -76,8 +81,8 @@ public class Andin extends Application{
 					initMediaPlayer();
 				}
 			});
-			String mediaName =m.getSource().replaceAll("(.*/)+", "Now playing: ");
-//			mediaName = mediaName.replaceAll("\\..*", "");
+			String mediaName =m.getSource().replaceAll("(.*/)+", "Now playing: ");	
+			mediaPlayer.volumeProperty().bindBidirectional(volumeSlider.valueProperty());
 			nowPlaying.setText(mediaName);
 			mediaView.setMediaPlayer(mediaPlayer);
 
@@ -97,17 +102,18 @@ public class Andin extends Application{
 	}
 	private HBox makeButtons(){
 		HBox buttonbox = new HBox();
+		
 		Button playButton = new Button("Play");
-		playButton.setOnAction(e -> mediaView.getMediaPlayer().play());
+		playButton.setOnAction(e -> setPlay());
 		Button pauseButton = new Button("Pause");
-		pauseButton.setOnAction(e -> mediaView.getMediaPlayer().pause());
+		pauseButton.setOnAction(e -> setPause());
 		Button stopButton = new Button("Stop");
-		stopButton.setOnAction(l -> mediaView.getMediaPlayer().stop());
+		stopButton.setOnAction(l -> setStop());
 		Button nextButton = new Button("Next");
 		nextButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
-				mediaView.getMediaPlayer().stop();
+				setStop();
 				initMediaPlayer();
 
 			}
@@ -125,6 +131,11 @@ public class Andin extends Application{
 		playMedia.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
+				FileChooser fileChooser = new FileChooser();
+				FileChooser.ExtensionFilter mp3Filter = new FileChooser.ExtensionFilter("mp3 files (*.mp3)", "*.mp3");
+				FileChooser.ExtensionFilter mp4Filter = new FileChooser.ExtensionFilter("mp4 files (*.mp4)", "*.mp4");
+				
+				fileChooser.getExtensionFilters().addAll(mp3Filter,mp4Filter);
 				File file = fileChooser.showOpenDialog(primaryStage);
 				if (file != null) {
 
@@ -144,6 +155,11 @@ public class Andin extends Application{
 		queueMedia.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
+				FileChooser fileChooser = new FileChooser();
+				FileChooser.ExtensionFilter mp3Filter = new FileChooser.ExtensionFilter("mp3 files (*.mp3)", "*.mp3");
+				FileChooser.ExtensionFilter mp4Filter = new FileChooser.ExtensionFilter("mp4 files (*.mp4)", "*.mp4");
+				
+				fileChooser.getExtensionFilters().addAll(mp3Filter,mp4Filter);
 				File file = fileChooser.showOpenDialog(primaryStage);
 				if (file != null) {
 
@@ -172,7 +188,7 @@ public class Andin extends Application{
 
 		VBox playlistContentsBox = new VBox();
 		playlistContentsBox.setVisible(false);
-		Button hideplaylistContentsBoxButton = new Button("<<< Hide tracks");		
+		Button hideplaylistContentsBoxButton = new Button("<<< Hide contents");		
 		playlistContentsBox.setVgrow(playlistContentsView, Priority.ALWAYS);
 		hideplaylistContentsBoxButton.setOnAction(new EventHandler<ActionEvent>(){
 			@Override
@@ -211,7 +227,10 @@ public class Andin extends Application{
 			@Override
 			public void handle(ActionEvent event) {
 				String playlistname = playlistView.getSelectionModel().getSelectedItem();
+				
 				playPlaylist(playlistname);
+				
+			
 			}
 		});
 		queuePlaylistOption.setOnAction(new EventHandler<ActionEvent>() {
@@ -229,6 +248,11 @@ public class Andin extends Application{
 		addToPlaylistOption.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				FileChooser fileChooser = new FileChooser();
+				FileChooser.ExtensionFilter mp3Filter = new FileChooser.ExtensionFilter("mp3 files (*.mp3)", "*.mp3");
+				FileChooser.ExtensionFilter mp4Filter = new FileChooser.ExtensionFilter("mp4 files (*.mp4)", "*.mp4");
+				
+				fileChooser.getExtensionFilters().addAll(mp3Filter,mp4Filter);
 				List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
 				int filesAmount = files.size();
 				String[] paths = new String[filesAmount];
@@ -246,15 +270,21 @@ public class Andin extends Application{
 				if(mouseEvent.getButton().equals(MouseButton.SECONDARY)){
 					contextMenu.show(aPane, mouseEvent.getScreenX(), mouseEvent.getSceneY());
 				}
-				if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount()==2){
-					String playlistname = playlistView.getSelectionModel().getSelectedItem();
-					playPlaylist(playlistname);
-				}
-				if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount()==1){
+				if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+					
 					String playlistName = playlistView.getSelectionModel().getSelectedItem();
-					showPlaylistContents(playlistName,playlistContentsBox);
-					playlistContentsBox.setVisible(true);
+					if(playlistName != null){
+						showPlaylistContents(playlistName,playlistContentsBox);
+						playlistContentsBox.setVisible(true);
+						
+						if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount()==2){
+							String playlistname = playlistView.getSelectionModel().getSelectedItem();
+							playPlaylist(playlistname);
+						}
+					}
+					
 				}
+				
 			}
 		});
 		newPlaylistButton.setOnAction(new EventHandler<ActionEvent>(){
@@ -312,35 +342,73 @@ public class Andin extends Application{
 		StackPane stackPane = new StackPane();
 
 		Pane backgroundPane = new Pane();
-		backgroundPane.setStyle("-fx-background-color: #abcdef");
+		backgroundPane.setStyle("-fx-background-color: linear-gradient(to bottom right, derive(goldenrod, 20%), derive(goldenrod, -40%));");
+		//backgroundPane.setStyle("-fx-background-color: #abcdef");
 		stackPane.getChildren().add(backgroundPane);
 		stackPane.getChildren().add(mediaView);
 		return stackPane;
 	}
-	public void playPlaylist(String playlistname){
+	private Slider makeSlider(){
+		
+		Slider volumeSlider = new Slider(0,1,0);
+		
+		volumeSlider.setOrientation(Orientation.HORIZONTAL);
+		
+		volumeSlider.setMaxWidth(300);
+		
+		volumeSlider.setValue(0.5);
+		
+		        
+		return volumeSlider;
+
+	}
+	private void playPlaylist(String playlistname){
 		String[] mediaPaths = playlistHandler.getMediaPaths(playlistname);
 		Media[] mediaArray = buildPlaylist(mediaPaths);
-		playMedia(mediaArray[0]);
-		for(int i=1;i<mediaArray.length;i++){
-			queueMedia(mediaArray[i]);
+		if(mediaArray.length !=0){
+			playMedia(mediaArray[0]);
+			for(int i=1;i<mediaArray.length;i++){
+				queueMedia(mediaArray[i]);
+			}
 		}
 	}
-	public void queueMedia(Media m){
+	private void queueMedia(Media m){
 		queue.add(m);
 		if(mediaView.getMediaPlayer() == null) {
 			initMediaPlayer();
 		}
 	}
-	public void playMedia(Media m){
+	private void playMedia(Media m){
 		queue.clear();
 		queue.add(m);
 		if(mediaView.getMediaPlayer() !=null){
-			mediaView.getMediaPlayer().stop();
+			setStop();
 			mediaView.setMediaPlayer(null);
 		}
 
 		initMediaPlayer();
 
+	}
+	private void setPlay(){
+		try{
+			mediaView.getMediaPlayer().play();
+		}catch(Exception e){
+			
+		}
+	}
+	private void setPause(){
+		try{
+			mediaView.getMediaPlayer().pause();
+		}catch(Exception e){
+			
+		}
+	}
+	private void setStop(){
+		try{
+			mediaView.getMediaPlayer().stop();
+		}catch(Exception e){
+			
+		}
 	}
 	
 }
